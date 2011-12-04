@@ -623,7 +623,19 @@ PACKAGE may be either a string or the corresponding symbol."
 	(el-get-dir
 	 (expand-file-name ".." (file-name-directory el-get-script))))
     (el-get-update "el-get")))
-
+
+(defun el-get-diff (package)
+  "Show difference between current and what el-get-update would install"
+  (interactive
+   (list (el-get-read-package-with-status "Show diff:" "required" "installed")))
+  (el-get-error-unless-package-p package)
+  (let* ((source   (el-get-package-def package))
+	 (method   (el-get-package-method source))
+	 (diff     (el-get-method method :diff)))
+    (if (not diff)
+	(error "el-get: package %s uses method %s, which doesn't support diff (yet)." package method)
+      (funcall diff package)
+      (message "el-get diff %s" package))))
 
 (defun el-get-post-remove (package)
   "Run the post-remove hooks for PACKAGE."

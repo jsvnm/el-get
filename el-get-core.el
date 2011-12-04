@@ -41,12 +41,13 @@ properties. Those should be the elisp functions to call for doing
 the named package action in the given method.")
 
 (defun el-get-register-method (name install update remove
-				    &optional install-hook remove-hook compute-checksum)
+				    &optional install-hook remove-hook compute-checksum diff)
   "Register the method for backend NAME, with given functions"
   (let ((def (list :install install :update update :remove remove)))
     (when install-hook     (setq def (append def (list :install-hook install-hook))))
     (when remove-hook      (setq def (append def (list :remove-hook remove-hook))))
     (when compute-checksum (setq def (append def (list :compute-checksum compute-checksum))))
+    (when diff             (setq def (append def (list :diff diff))))
     (setq el-get-methods (plist-put el-get-methods name def))))
 
 
