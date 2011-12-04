@@ -126,21 +126,29 @@ found."
 (defun el-get-git-diff-endfun (package)
   (with-current-buffer (get-buffer-create el-get-diff-buffer)
     (let ((diff (cdr (assoc package tmp-diff))))
-      (if diff
+      (if (not diff)
           (insert
-           (propertize (format "Diff for package %s:\n" package) 'face 'isearch)
-           (apply #'concat diff))
+           (propertize (format "Package %s has no updates.\n\n" package) 'face 'highlight))
         (insert
-         (propertize (format "Package %s has no updates.\n" package) 'face 'highlight)))))
+         (propertize (format "Diff for package %s:\n" package) 'face 'isearch)
+         (apply #'concat diff))
+        (insert-button
+         (format "Update %s" package)
+         'package package
+         'action (lambda (btn)
+                   (let ((package (button-get btn 'package)))
+                     (when (y-or-n-p (format "Do you really want to update `%s'? " package))
+                       (el-get-update package)
+                       (message "el-get-update %s" package)))))
+        (insert "\n\n"))))
   (pop-to-buffer el-get-diff-buffer))
 
 (defun el-get-diff-filter (proc str)
   (with-current-buffer (get-buffer-create el-get-diff-buffer)
-;;    (message "profi %S" (process-get proc :el-get-package))
     (let* ((p   (process-get proc :el-get-package))
            (tmp (assoc p tmp-diff))
            (old (cdr tmp)))
-    (setcdr tmp `(,@old ,(ansi-color-apply str))))))
+      (setcdr tmp `(,@old ,(ansi-color-apply str))))))
 
 (assoc 'foo '((foo . "kale")))
 
