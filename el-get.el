@@ -624,6 +624,15 @@ PACKAGE may be either a string or the corresponding symbol."
 	 (expand-file-name ".." (file-name-directory el-get-script))))
     (el-get-update "el-get")))
 
+;;;###autoload
+(defvar el-get-diff-buffer "*el-get diff*")
+
+;;;###autoload
+(defun el-get-diff-all ()
+  (interactive)
+  (mapc 'el-get-diff (el-get-list-package-names-with-status "installed")))
+
+;;;###autoload
 (defun el-get-diff (package)
   "Show difference between current and what el-get-update would install"
   (interactive
@@ -633,7 +642,7 @@ PACKAGE may be either a string or the corresponding symbol."
 	 (method   (el-get-package-method source))
 	 (diff     (el-get-method method :diff)))
     (if (not diff)
-	(error "el-get: package %s uses method %s, which doesn't support diff (yet)." package method)
+	(message "el-get: package %s uses method %s, which doesn't support diff (yet)." package method)
       (funcall diff package)
       (message "el-get diff %s" package))))
 
